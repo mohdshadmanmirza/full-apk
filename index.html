@@ -1,65 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Hold Press Close Popup Demo</title>
-<style>
-  body, html {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    display: flex; justify-content: center; align-items: center;
-    background: #000;
-    color: white;
-    font-family: Arial, sans-serif;
-  }
-  #popup {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255,0,0,0.9);
-    display: flex; justify-content: center; align-items: center;
-    font-size: 24px;
-    z-index: 1000;
-  }
-  #holdMessage {
-    position: fixed;
-    bottom: 20px; left: 50%;
-    transform: translateX(-50%);
-    background: #333; padding: 10px 20px; border-radius: 10px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Fake Android Scam Alert Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: linear-gradient(#1a1a1a, #2a2a2a);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .warning {
+      background-color: red;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .popup {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 360px;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      text-align: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .popup h2 {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    .popup p {
+      font-size: 14px;
+    }
+
+    .android-logo {
+      width: 40px;
+      margin-bottom: 10px;
+    }
+
+    .fake-call {
+      margin-top: 15px;
+      padding: 10px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .footer-note {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
 
-<div id="popup">Danger! Scam detected! Hold BACK button for 3 seconds to close.</div>
-<div id="holdMessage" style="display:none;">Holding... Release to cancel.</div>
+  <div class="warning">
+    ⚠️ DEMO ONLY: This is a fake scam popup created for educational awareness. Do not trust such messages online.
+  </div>
 
-<script>
-  let holdTimer = null;
-  let holdMessage = document.getElementById('holdMessage');
-  let popup = document.getElementById('popup');
+  <div class="popup">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" class="android-logo" alt="Android Logo" />
+    <h2>VIRUS DETECTED!</h2>
+    <p>Your Android device is infected. Immediate action required.</p>
+    <p>Contact Android Support: <strong>1-888-FAKE-CALL</strong></p>
+    <button class="fake-call" onclick="alert('This is a simulation. Do not call any numbers you see in scam popups.')">
+      Call Support
+    </button>
+  </div>
 
-  // Simulating back button hold with "Backspace" key hold (for demo)
-  window.addEventListener('keydown', e => {
-    if(e.key === "Backspace" && !holdTimer) {
-      holdMessage.style.display = 'block';
-      holdTimer = setTimeout(() => {
-        popup.style.display = 'none';
-        holdMessage.style.display = 'none';
-        alert('Popup closed after hold!');
-      }, 3000); // 3 seconds hold required
-    }
-  });
-
-  window.addEventListener('keyup', e => {
-    if(e.key === "Backspace") {
-      holdMessage.style.display = 'none';
-      if(holdTimer) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-        alert('Hold cancelled');
-      }
-    }
-  });
-</script>
+  <div class="footer-note">
+    Simulation Only — No real threat. Educate and stay safe.
+  </div>
 
 </body>
 </html>
