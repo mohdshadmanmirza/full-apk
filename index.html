@@ -2,113 +2,63 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Android Scam Alert Demo</title>
+<title>Hold Press Close Popup Demo</title>
 <style>
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%; width: 100%;
-    background: #212121;
+  body, html {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    display: flex; justify-content: center; align-items: center;
+    background: #000;
+    color: white;
     font-family: Arial, sans-serif;
-    overflow: hidden;
-    user-select: none;
   }
-  #overlay {
+  #popup {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #b71c1c;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    text-align: center;
-    z-index: 9999;
+    background: rgba(255,0,0,0.9);
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px;
+    z-index: 1000;
   }
-  #android-logo {
-    width: 80px;
-    margin-bottom: 20px;
-  }
-  h1 {
-    font-size: 30px;
-    margin-bottom: 10px;
-  }
-  p {
-    font-size: 18px;
-    margin-bottom: 30px;
-  }
-  button {
-    background: #388e3c;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-size: 20px;
-    color: white;
-    cursor: pointer;
-    user-select: none;
-  }
-  button:active {
-    background: #2e7d32;
+  #holdMessage {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: #333; padding: 10px 20px; border-radius: 10px;
   }
 </style>
 </head>
 <body>
 
-<div id="overlay" role="alert" aria-live="assertive" aria-atomic="true">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" id="android-logo" />
-  <h1>⚠️ WARNING ⚠️</h1>
-  <p>Your phone is infected with a virus!<br/>Call support immediately!</p>
-  <button onclick="callSupport()">Call Support: 888-888-8888</button>
-</div>
-
-<audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<div id="popup">Danger! Scam detected! Hold BACK button for 3 seconds to close.</div>
+<div id="holdMessage" style="display:none;">Holding... Release to cancel.</div>
 
 <script>
-  // Play alert sound repeatedly
-  const alertSound = document.getElementById('alertSound');
-  function playAlert() {
-    alertSound.play().catch(() => {});
-  }
-  alertSound.addEventListener('ended', () => {
-    setTimeout(() => {
-      playAlert();
-    }, 1000);
-  });
+  let holdTimer = null;
+  let holdMessage = document.getElementById('holdMessage');
+  let popup = document.getElementById('popup');
 
-  playAlert();
-
-  // Prevent back button navigation by pushing history state
-  history.pushState(null, null, location.href);
-  window.onpopstate = function () {
-    history.pushState(null, null, location.href);
-    alert("Back navigation disabled! Please use Home button.");
-  };
-
-  // Call dialer function
-  function callSupport() {
-    window.location.href = "tel:8888888888";
-  }
-
-  // Request fullscreen on user gesture (click anywhere on screen)
-  function goFullscreen() {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen();
-    } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
-      document.documentElement.webkitRequestFullscreen();
+  // Simulating back button hold with "Backspace" key hold (for demo)
+  window.addEventListener('keydown', e => {
+    if(e.key === "Backspace" && !holdTimer) {
+      holdMessage.style.display = 'block';
+      holdTimer = setTimeout(() => {
+        popup.style.display = 'none';
+        holdMessage.style.display = 'none';
+        alert('Popup closed after hold!');
+      }, 3000); // 3 seconds hold required
     }
-  }
-
-  // Optional: on overlay click go fullscreen
-  document.getElementById('overlay').addEventListener('click', () => {
-    goFullscreen();
   });
 
-  // Try to block context menu and long press
-  window.addEventListener('contextmenu', e => e.preventDefault());
-  window.addEventListener('touchstart', e => {
-    if (e.touches.length > 1) e.preventDefault();
-  }, { passive: false });
+  window.addEventListener('keyup', e => {
+    if(e.key === "Backspace") {
+      holdMessage.style.display = 'none';
+      if(holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+        alert('Hold cancelled');
+      }
+    }
+  });
 </script>
 
 </body>
