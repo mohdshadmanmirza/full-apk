@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Secure Lock with Back Alert</title>
+  <title>Secure Lock - Back Button Trap</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
@@ -64,17 +64,16 @@
     document.addEventListener("click", forceFullscreen);
     document.addEventListener("touchstart", forceFullscreen);
 
-    // Deep history trap
     document.addEventListener("DOMContentLoaded", () => {
       forceFullscreen();
-      for (let i = 0; i < 50; i++) {
+      // Fill history
+      for (let i = 0; i < 100; i++) {
         history.pushState({}, '', location.href + '#' + i);
       }
     });
 
-    // Back button trap with alert
+    // Silent back trap (no alert)
     window.onpopstate = function () {
-      alert("🚫 Back button is disabled!");
       history.pushState({}, '', location.href + '#' + Math.random());
       forceFullscreen();
     };
