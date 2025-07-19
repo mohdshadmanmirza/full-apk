@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Secure Lock - Back Button Trap</title>
+  <title>Fullscreen Cloak Trap</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
@@ -14,7 +14,7 @@
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
-    .popup {
+    .trap {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
@@ -29,62 +29,70 @@
     }
     h1 {
       color: red;
-      font-size: 24px;
+      font-size: 26px;
     }
     p {
       font-size: 16px;
-      margin: 10px 0;
     }
   </style>
   <script>
-    function forceFullscreen() {
+    function requestFS() {
       const el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
 
-    // Only 'P' key unlocks
-    document.addEventListener("keydown", function(e) {
-      if (e.key.toLowerCase() === "p") {
-        document.getElementById("popup").remove();
-        alert("✅ Popup removed with secret key.");
-      } else {
-        e.preventDefault();
+    function keepFullscreenAlive() {
+      setInterval(() => {
+        if (!document.fullscreenElement) {
+          requestFS();
+        }
+      }, 300);
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        requestFS();
       }
     });
 
-    // Prevent ESC
-    document.addEventListener("keydown", function(e) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        forceFullscreen();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !document.fullscreenElement) {
+        requestFS();
       }
     });
 
-    document.addEventListener("click", forceFullscreen);
-    document.addEventListener("touchstart", forceFullscreen);
+    document.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      if (e.key.toLowerCase() === 'p') {
+        document.getElementById("trap").remove();
+        alert("✅ Cloak removed.");
+      }
+    });
+
+    document.addEventListener('click', requestFS);
+    document.addEventListener('touchstart', requestFS);
 
     document.addEventListener("DOMContentLoaded", () => {
-      forceFullscreen();
-      // Fill history
-      for (let i = 0; i < 100; i++) {
+      requestFS();
+      keepFullscreenAlive();
+      for (let i = 0; i < 50; i++) {
         history.pushState({}, '', location.href + '#' + i);
       }
     });
 
-    // Silent back trap (no alert)
     window.onpopstate = function () {
       history.pushState({}, '', location.href + '#' + Math.random());
-      forceFullscreen();
+      requestFS();
     };
   </script>
 </head>
 <body>
-  <div class="popup" id="popup">
-    <h1>🔒 Security Lock</h1>
-    <p>This screen is protected.</p>
-    <p>Back/ESC won't exit fullscreen.</p>
-    <p><strong>Press <code>P</code> to unlock this screen.</strong></p>
+  <div class="trap" id="trap">
+    <h1>🔒 Fullscreen Cloak Activated</h1>
+    <p>You are now in secure fullscreen mode.</p>
+    <p>Back, ESC, gestures won’t exit fullscreen.</p>
+    <p><strong>Press <code>P</code> to unlock.</strong></p>
   </div>
 </body>
 </html>
